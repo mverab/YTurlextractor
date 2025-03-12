@@ -1,0 +1,34 @@
+# Archivos de entorno
+.env
+
+# Directorios de resultados
+transcripciones/
+prueba_video/
+prueba_canal/
+
+# Archivos de caché de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Entornos virtuales
+venv/
+env/
+.venv/
+.env/
+.python-version
+
+# Archivos de distribución
+dist/
+build/
+*.egg-info/
+
+# Archivos de IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db 
