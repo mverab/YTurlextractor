@@ -84,32 +84,32 @@ def get_channel_videos(channel_id):
     # Recuperar videos de la lista de reproducción de subidas
     while True:
         try:
-        playlist_response = youtube.playlistItems().list(
-            playlistId=uploads_playlist_id,
+            playlist_response = youtube.playlistItems().list(
+                playlistId=uploads_playlist_id,
                 part='snippet,contentDetails',
                 maxResults=50,  # Máximo permitido por solicitud
-            pageToken=next_page_token
-        ).execute()
+                pageToken=next_page_token
+            ).execute()
 
-        for item in playlist_response.get('items', []):
+            for item in playlist_response.get('items', []):
                 video_id = item['contentDetails']['videoId']
-            video_url = f"https://www.youtube.com/watch?v={video_id}"
-            video_title = item['snippet']['title']
-            video_published_at = item['snippet']['publishedAt']
-            videos.append({
+                video_url = f"https://www.youtube.com/watch?v={video_id}"
+                video_title = item['snippet']['title']
+                video_published_at = item['snippet']['publishedAt']
+                videos.append({
                     'id': video_id,
-                'url': video_url,
-                'title': video_title,
+                    'url': video_url,
+                    'title': video_title,
                     'published_at': video_published_at,
                     'channel_title': channel_info['title'],
                     'channel_id': channel_id
-            })
+                })
                 total_videos += 1
-        
+            
             print(f"Obtenidos {total_videos} videos hasta ahora...")
-        next_page_token = playlist_response.get('nextPageToken')
-        if not next_page_token:
-            break
+            next_page_token = playlist_response.get('nextPageToken')
+            if not next_page_token:
+                break
 
             # Pequeña pausa para evitar límites de la API
             time.sleep(0.5)
@@ -133,7 +133,8 @@ def get_transcript(video_id_or_url):
         # Intentar todas las transcripciones disponibles, empezando por las manuales
         for transcript in transcript_list:
             try:
-                print(f"Intentando con transcripción en {transcript.language} (generada automáticamente: {transcript.is_generated})")
+                print(f"Intentando con transcripción en {transcript.language} "
+                      f"(generada automáticamente: {transcript.is_generated})")
                 transcript_data = transcript.fetch()
                 
                 # Convertir a texto plano
@@ -222,7 +223,11 @@ def save_videos_to_csv(videos, filename):
     """Guarda los videos y sus transcripciones en un archivo CSV."""
     with open(filename, mode='w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
-        writer.writerow(['ID', 'URL', 'Título', 'Canal', 'ID del Canal', 'Fecha de Publicación', 'Idioma', 'Generada Automáticamente', 'Éxito', 'Error'])
+        writer.writerow([
+            'ID', 'URL', 'Título', 'Canal', 'ID del Canal', 
+            'Fecha de Publicación', 'Idioma', 'Generada Automáticamente', 
+            'Éxito', 'Error'
+        ])
         
         for video in videos:
             writer.writerow([
@@ -292,7 +297,8 @@ def load_progress(output_dir, channel_id):
                 if progress_data.get('channel_id') == channel_id:
                     return progress_data.get('processed_count', 0), progress_data.get('remaining_videos', [])
                 else:
-                    print(f"El archivo de progreso es para otro canal ({progress_data.get('channel_id')}). Ignorando.")
+                    print(f"El archivo de progreso es para otro canal "
+                          f"({progress_data.get('channel_id')}). Ignorando.")
         except Exception as e:
             print(f"Error al cargar el progreso: {e}")
     
@@ -344,7 +350,8 @@ def process_single_video(video_url, output_dir):
             
             return True
         else:
-            print(f"No se pudo obtener la transcripción: {transcript_info.get('error', 'Error desconocido')}")
+            print(f"No se pudo obtener la transcripción: "
+                  f"{transcript_info.get('error', 'Error desconocido')}")
             return False
     
     except Exception as e:
@@ -400,7 +407,8 @@ def process_channel(channel_id, output_dir, limit=None, force_refresh=False):
     
     try:
         for i, video in enumerate(videos):
-            print(f"\nProcesando video {processed_count + i + 1}/{processed_count + total_videos}: {video['title']}")
+            print(f"\nProcesando video {processed_count + i + 1}/{processed_count + total_videos}: "
+                  f"{video['title']}")
             
             # Verificar si el archivo de texto ya existe
             safe_title = "".join([c if c.isalnum() or c in [' ', '-', '_'] else '_' for c in video['title']])
@@ -490,7 +498,8 @@ def parse_arguments():
     channel_parser.add_argument('channel_id', type=str, nargs='?', default=DEFAULT_CHANNEL_ID,
                                help=f'ID del canal de YouTube (por defecto: {DEFAULT_CHANNEL_ID})')
     channel_parser.add_argument('--limit', '-l', type=int, default=DEFAULT_VIDEO_LIMIT,
-                               help=f'Limitar el número de videos a procesar (0 = sin límite, por defecto: {DEFAULT_VIDEO_LIMIT})')
+                               help=f'Limitar el número de videos a procesar (0 = sin límite, '
+                                    f'por defecto: {DEFAULT_VIDEO_LIMIT})')
     channel_parser.add_argument('--force', '-f', action='store_true',
                                help='Forzar el reprocesamiento de videos ya procesados')
     
@@ -529,4 +538,4 @@ def main():
     return True
 
 if __name__ == "__main__":
-    main()
+    main() 
